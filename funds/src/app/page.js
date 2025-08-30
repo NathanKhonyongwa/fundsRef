@@ -17,18 +17,23 @@ import { db } from "./lib/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export default function FundsPage() {
-  const goal = 2000000; // 2 Million Kwacha
-  const [amount, setAmount] = useState(0);
+  const goal = 2_000_000; // 2 Million Kwacha
+  const [amount, setAmount] = useState(0); // ✅ always a number
   const [inputValue, setInputValue] = useState("");
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   // ✅ Load from Firestore when page loads
   useEffect(() => {
     const fetchFunds = async () => {
-      const docRef = doc(db, "funds", "progress");
-      const snapshot = await getDoc(docRef);
-      if (snapshot.exists()) {
-        setAmount(snapshot.data().amount);
+      try {
+        const docRef = doc(db, "funds", "progress");
+        const snapshot = await getDoc(docRef);
+        if (snapshot.exists()) {
+          // default to 0 if amount is missing
+          setAmount(snapshot.data().amount ?? 0);
+        }
+      } catch (error) {
+        console.error("Error fetching funds:", error);
       }
     };
     fetchFunds();
@@ -67,7 +72,7 @@ export default function FundsPage() {
     }
   };
 
-  const remaining = goal - amount;
+  const remaining = Math.max(goal - amount, 0);
   const surplus = amount > goal ? amount - goal : 0;
 
   return (
@@ -106,7 +111,7 @@ export default function FundsPage() {
         transition={{ type: "spring", stiffness: 200 }}
         className="text-xl font-semibold mb-2"
       >
-        Current Amount: {amount.toLocaleString()} Kwacha
+        Current Amount: {Number(amount).toLocaleString()} Kwacha
       </motion.div>
 
       {/* Remaining / Surplus */}
@@ -132,7 +137,9 @@ export default function FundsPage() {
             <XAxis dataKey="name" />
             {/* ✅ Dynamic Y-axis (supports surplus) */}
             <YAxis domain={[0, Math.max(goal, amount)]} />
-            <Tooltip formatter={(value) => `${value.toLocaleString()} Kwacha`} />
+            <Tooltip
+              formatter={(value) => `${Number(value).toLocaleString()} Kwacha`}
+            />
             <Bar
               dataKey="kwacha"
               fill="#22c55e"
