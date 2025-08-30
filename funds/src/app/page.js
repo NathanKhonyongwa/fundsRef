@@ -83,7 +83,7 @@ export default function FundsPage() {
       )}
 
       <h1 className="text-3xl font-bold text-center mb-6">
-        Area 49 SDA Youth Choir FundsReflect: ACC#: 1008826807 |National Bank| Jacqueline Jumbe
+        Area 49 Youth choir FundsReflect: ACC#: 1008826807 |National Bank| Jacqueline Jumbe
       </h1>
 
       {/* Input form */}
